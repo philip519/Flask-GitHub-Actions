@@ -1,0 +1,31 @@
+
+name: Flask CI Pipeline
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Test Flask Application
+        run: |
+          python -m compileall -q app.py
+          python -c "from app import app; assert app.test_client().get('/').status_code == 200"
+
+      - name: Build Docker Image
+        run: docker build -t flask-api .
+
